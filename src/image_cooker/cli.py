@@ -58,7 +58,7 @@ def _resolve_single_file_target(source: Path, target: Path) -> Path:
     "--max-edge",
     "max_edge",
     type=click.IntRange(min=1),
-    default=1920,
+    default=2560,
     show_default=True,
     help="Cap on the longest edge in pixels. Aspect ratio is preserved; smaller images are not upscaled.",
 )
@@ -66,7 +66,7 @@ def _resolve_single_file_target(source: Path, target: Path) -> Path:
     "--quality",
     "quality",
     type=click.IntRange(min=1, max=100),
-    default=80,
+    default=85,
     show_default=True,
     help="WebP encoder quality (1-100).",
 )
