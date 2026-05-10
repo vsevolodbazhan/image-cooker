@@ -26,9 +26,7 @@ def _format_result(result: ConversionResult) -> str:
     src_w, src_h = result.src_size
     dst_w, dst_h = result.dst_size
     delta_pct = (
-        (result.dst_bytes - result.src_bytes) / result.src_bytes * 100
-        if result.src_bytes
-        else 0.0
+        (result.dst_bytes - result.src_bytes) / result.src_bytes * 100 if result.src_bytes else 0.0
     )
     return (
         f"{result.src} -> {result.dst}  "
@@ -66,7 +64,10 @@ def main(
         typer.Option(
             "--max-edge",
             min=1,
-            help="Cap on the longest edge in pixels. Aspect ratio is preserved; smaller images are not upscaled.",
+            help=(
+                "Cap on the longest edge in pixels. Aspect ratio is preserved; "
+                "smaller images are not upscaled."
+            ),
         ),
     ] = 2560,
     quality: Annotated[
@@ -94,8 +95,7 @@ def main(
         results, failures = _run([(source, dst)], max_edge, quality)
     else:
         pairs = [
-            (path, mirror_destination(path, source, target))
-            for path in discover(source, recursive)
+            (path, mirror_destination(path, source, target)) for path in discover(source, recursive)
         ]
         if not pairs:
             typer.echo("No JPEG/PNG images found.", err=True)
@@ -124,14 +124,10 @@ def _run(
     return results, failures
 
 
-def _print_totals(
-    results: list[ConversionResult], failures: list[tuple[Path, Exception]]
-) -> None:
+def _print_totals(results: list[ConversionResult], failures: list[tuple[Path, Exception]]) -> None:
     total_src = sum(r.src_bytes for r in results)
     total_dst = sum(r.dst_bytes for r in results)
-    delta_pct = (
-        (total_dst - total_src) / total_src * 100 if total_src else 0.0
-    )
+    delta_pct = (total_dst - total_src) / total_src * 100 if total_src else 0.0
     typer.echo(
         f"\n{len(results)} converted, {len(failures)} failed. "
         f"Total: {_format_kb(total_src)} -> {_format_kb(total_dst)} "

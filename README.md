@@ -190,8 +190,16 @@ photo blogs on retina displays. If you want to push further:
 git clone https://github.com/<your-fork>/image-cooker.git
 cd image-cooker
 uv sync
+uv run pre-commit install   # one-time: wire up commit + push hooks
 uv run pytest
 ```
+
+Quality gates run automatically:
+
+- **On `git commit`** — `ruff check --fix`, `ruff format`, `pyright`
+- **On `git push`** — `pytest`
+
+To run them manually: `uv run pre-commit run --all-files`.
 
 Project layout:
 

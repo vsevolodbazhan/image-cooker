@@ -30,9 +30,7 @@ def discover(source: Path, recursive: bool) -> Iterator[Path]:
             yield path
 
 
-def compute_resize(
-    size: tuple[int, int], max_edge: int
-) -> tuple[int, int] | None:
+def compute_resize(size: tuple[int, int], max_edge: int) -> tuple[int, int] | None:
     width, height = size
     longest = max(width, height)
     if longest <= max_edge:
