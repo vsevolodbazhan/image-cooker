@@ -5,3 +5,4 @@ src/image_cooker/_version.py
 dist/
 build/
 *.egg-info/
+.ruff_cache
