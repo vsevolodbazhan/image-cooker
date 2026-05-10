@@ -23,12 +23,13 @@ When `--source` is a directory, the source tree is mirrored under `--target`, wi
 ## Install
 
 ```shell
-pip install -e .
+uv sync
+uv run image-cooker --source <path> --target <path>
 ```
 
 ## Develop
 
 ```shell
-pip install -e '.[dev]'
-pytest
+uv sync
+uv run pytest
 ```

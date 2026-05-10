@@ -14,11 +14,11 @@ dependencies = [
     "click>=8.1",
 ]
 
-[project.optional-dependencies]
-dev = ["pytest>=7.0"]
-
 [project.scripts]
 image-cooker = "image_cooker.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=7.0"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/image_cooker"]
