@@ -1,3 +1,7 @@
 .venv
 .pytest_cache
 __pycache__
+src/image_cooker/_version.py
+dist/
+build/
+*.egg-info/
