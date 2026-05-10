@@ -2,7 +2,7 @@
 
 > Bake your blog photos. Downscale once, re-encode as WebP, ship to the web.
 
-![CI](https://img.shields.io/github/actions/workflow/status/<your-fork>/image-cooker/ci.yml?branch=main&label=ci)
+![CI](https://img.shields.io/github/actions/workflow/status/vsevolodbazhan/image-cooker/ci.yml?branch=main&label=ci)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Built with Typer](https://img.shields.io/badge/CLI-Typer-informational)
@@ -76,7 +76,7 @@ Output:
 ### From source (current)
 
 ```sh
-git clone https://github.com/<your-fork>/image-cooker.git
+git clone https://github.com/vsevolodbazhan/image-cooker.git
 cd image-cooker
 uv sync
 ```
@@ -188,7 +188,7 @@ photo blogs on retina displays. If you want to push further:
 ## Development
 
 ```sh
-git clone https://github.com/<your-fork>/image-cooker.git
+git clone https://github.com/vsevolodbazhan/image-cooker.git
 cd image-cooker
 uv sync
 uv run pre-commit install   # one-time: wire up commit + push hooks
