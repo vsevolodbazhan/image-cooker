@@ -2,6 +2,7 @@
 
 > Bake your blog photos. Downscale once, re-encode as WebP, ship to the web.
 
+![CI](https://img.shields.io/github/actions/workflow/status/<your-fork>/image-cooker/ci.yml?branch=main&label=ci)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Built with Typer](https://img.shields.io/badge/CLI-Typer-informational)

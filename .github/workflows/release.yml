@@ -1,0 +1,54 @@
+# Publishes to PyPI on tagged releases (e.g. `git tag v0.1.0 && git push --tags`).
+#
+# Setup (one-time, on PyPI):
+#   1. Create the project on PyPI (or register a "pending" trusted publisher).
+#   2. In the project's "Publishing" settings, add a GitHub trusted publisher
+#      pointing at this repository, workflow `release.yml`, environment `pypi`.
+#   3. In GitHub repository settings, create an Environment named `pypi`
+#      (optional protections: required reviewers, branch restrictions).
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    name: build distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Build sdist + wheel
+        run: uv build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/image-cooker
+    permissions:
+      id-token: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish via trusted publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
