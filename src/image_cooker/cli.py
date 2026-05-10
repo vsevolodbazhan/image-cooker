@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Annotated
 
@@ -11,6 +13,8 @@ from image_cooker.processor import (
     discover,
     mirror_destination,
 )
+
+DEFAULT_JOBS = os.cpu_count() or 1
 
 app = typer.Typer(
     add_completion=False,
@@ -86,13 +90,25 @@ def main(
             help="Recurse into subdirectories when source is a directory.",
         ),
     ] = True,
+    jobs: Annotated[
+        int,
+        typer.Option(
+            "--jobs",
+            "-j",
+            min=1,
+            help=(
+                "Number of worker processes. 1 disables parallelism. "
+                "Defaults to the host CPU count."
+            ),
+        ),
+    ] = DEFAULT_JOBS,
 ) -> None:
     source = source.resolve()
     target = target.resolve() if target.is_absolute() else Path.cwd() / target
 
     if source.is_file():
         dst = _resolve_single_file_target(source, target)
-        results, failures = _run([(source, dst)], max_edge, quality)
+        results, failures = _run([(source, dst)], max_edge, quality, jobs)
     else:
         pairs = [
             (path, mirror_destination(path, source, target)) for path in discover(source, recursive)
@@ -100,7 +116,7 @@ def main(
         if not pairs:
             typer.echo("No JPEG/PNG images found.", err=True)
             raise typer.Exit(0)
-        results, failures = _run(pairs, max_edge, quality)
+        results, failures = _run(pairs, max_edge, quality, jobs)
 
     _print_totals(results, failures)
     if failures:
@@ -108,6 +124,14 @@ def main(
 
 
 def _run(
+    pairs: list[tuple[Path, Path]], max_edge: int, quality: int, jobs: int
+) -> tuple[list[ConversionResult], list[tuple[Path, Exception]]]:
+    if jobs <= 1 or len(pairs) <= 1:
+        return _run_sequential(pairs, max_edge, quality)
+    return _run_parallel(pairs, max_edge, quality, jobs)
+
+
+def _run_sequential(
     pairs: list[tuple[Path, Path]], max_edge: int, quality: int
 ) -> tuple[list[ConversionResult], list[tuple[Path, Exception]]]:
     results: list[ConversionResult] = []
@@ -121,6 +145,28 @@ def _run(
             continue
         typer.echo(_format_result(result))
         results.append(result)
+    return results, failures
+
+
+def _run_parallel(
+    pairs: list[tuple[Path, Path]], max_edge: int, quality: int, jobs: int
+) -> tuple[list[ConversionResult], list[tuple[Path, Exception]]]:
+    results: list[ConversionResult] = []
+    failures: list[tuple[Path, Exception]] = []
+    with ProcessPoolExecutor(max_workers=jobs) as pool:
+        future_to_src = {
+            pool.submit(convert, src, dst, max_edge, quality): src for src, dst in pairs
+        }
+        for future in as_completed(future_to_src):
+            src = future_to_src[future]
+            try:
+                result = future.result()
+            except Exception as exc:  # noqa: BLE001
+                typer.echo(f"FAIL {src}: {exc}", err=True)
+                failures.append((src, exc))
+                continue
+            typer.echo(_format_result(result))
+            results.append(result)
     return results, failures
 
 

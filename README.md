@@ -48,6 +48,8 @@ with no perceptible quality loss, just by running the defaults.
   professional image tools use.
 - **Per-file resilience.** A bad file is logged and skipped; the rest of
   the batch keeps going. The process exits non-zero if anything failed.
+- **Parallel by default.** Uses every CPU core to fan out the batch via
+  a process pool. Tunable with `--jobs N`, or set to `1` for sequential.
 - **Zero hidden state.** No config files, no caches, no surprise
   network calls. What you pass on the command line is what you get.
 
@@ -107,6 +109,7 @@ Usage: image-cooker [OPTIONS]
 | `--max-edge INT` | `2560` | Cap on the longest edge in pixels. Aspect ratio is preserved; smaller images are not upscaled. |
 | `--quality INT` | `85` | WebP encoder quality, 1–100. |
 | `--recursive / --no-recursive` | `recursive` | Recurse into subdirectories when source is a directory. |
+| `--jobs INT`, `-j INT` | host CPU count | Number of worker processes. `1` disables parallelism. |
 | `-h`, `--help` | | Show the help message and exit. |
 
 ### Examples
@@ -214,6 +217,7 @@ image-cooker/
 │   ├── cli.py                  # Typer command, orchestration
 │   └── processor.py            # discovery + image transform
 └── tests/
+    ├── test_cli.py             # CLI integration tests
     └── test_processor.py       # pipeline unit tests
 ```
 
