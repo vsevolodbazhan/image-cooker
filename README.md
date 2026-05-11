@@ -58,7 +58,7 @@ with no perceptible quality loss, just by running the defaults.
 ## Quick start
 
 ```sh
-uv run image-cooker --source ~/Pictures/blog --target ./optimised
+uvx image-cooker --source ~/Pictures/blog --target ./optimised
 ```
 
 Output:
@@ -75,22 +75,36 @@ Output:
 
 ## Installation
 
-### From source (current)
+Run without installing (ephemeral, fetched on demand):
 
 ```sh
-git clone https://github.com/vsevolodbazhan/image-cooker.git
-cd image-cooker
-uv sync
+uvx image-cooker --help
 ```
 
-Then run via `uv run image-cooker ...` or activate the venv and use
-the `image-cooker` console script directly.
+Install persistently so `image-cooker` lives on your `PATH`:
+
+```sh
+uv tool install image-cooker
+```
+
+Or with `pipx`:
+
+```sh
+pipx install image-cooker
+```
+
+Or plain `pip` into a venv of your choice:
+
+```sh
+pip install image-cooker
+```
 
 ### Requirements
 
 - Python **3.10+**
-- [uv](https://docs.astral.sh/uv/) (recommended), or any
-  PEP 517–compatible installer (pip, pipx, hatch, …)
+- [uv](https://docs.astral.sh/uv/) recommended for the `uvx` and
+  `uv tool install` flows above, but any PEP 517–compatible installer
+  works.
 
 ---
 
@@ -117,13 +131,13 @@ Usage: image-cooker [OPTIONS]
 **Optimise a whole blog photo folder, recursively:**
 
 ```sh
-uv run image-cooker --source ~/Pictures/blog --target ~/Sites/cooked
+image-cooker --source ~/Pictures/blog --target ~/Sites/cooked
 ```
 
 **Cook a single hero image with custom settings:**
 
 ```sh
-uv run image-cooker \
+image-cooker \
   --source hero.jpg \
   --target hero.webp \
   --max-edge 1920 \
@@ -133,7 +147,7 @@ uv run image-cooker \
 **Build a smaller thumbnail set in a sibling directory:**
 
 ```sh
-uv run image-cooker \
+image-cooker \
   --source ~/Pictures/blog \
   --target ./thumbs \
   --max-edge 960 \
@@ -143,7 +157,7 @@ uv run image-cooker \
 **Process only the top level (no recursion):**
 
 ```sh
-uv run image-cooker --source ./photos --target ./out --no-recursive
+image-cooker --source ./photos --target ./out --no-recursive
 ```
 
 ---
@@ -168,8 +182,9 @@ The pipeline is deliberately small and easy to reason about:
    intentionally **not** carried over.
 6. **Report** — one line per file plus a final summary.
 
-That's it. There is no caching, no parallelism, no hidden config — the
-code is short enough to read in a sitting.
+Steps 3–5 fan out across a `ProcessPoolExecutor` by default; set
+`--jobs 1` to walk the batch sequentially. There is no caching and no
+hidden config — the code is short enough to read in a sitting.
 
 ---
 
